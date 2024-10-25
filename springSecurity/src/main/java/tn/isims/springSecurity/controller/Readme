@@ -1,0 +1,20 @@
+Dans le contexte de Spring Security, l'AuthenticationManager utilise effectivement un objet Authentication pour traiter le processus d'authentification.
+Voici comment cela fonctionne :
+
+Objet Authentication Initial :
+Lorsque l'utilisateur tente de se connecter, ses informations d'identification
+ (comme le nom d'utilisateur et le mot de passe) sont encapsulées dans un objet
+  Authentication initial. Un exemple commun de cela est UsernamePasswordAuthenticationToken,
+   qui est une implémentation de l'interface Authentication.
+
+Authentification par l'AuthenticationManager : Cet objet Authentication est
+ensuite passé à la méthode authenticate() de l'AuthenticationManager.
+ Voici comment cela se passe :
+
+
+ Authentication authentication = authenticationManager.authenticate(
+     new UsernamePasswordAuthenticationToken(
+         loginRequest.getUsername(),
+         loginRequest.getPassword()
+     )
+ );

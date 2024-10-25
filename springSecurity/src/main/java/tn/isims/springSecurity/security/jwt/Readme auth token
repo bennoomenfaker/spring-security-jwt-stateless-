@@ -1,0 +1,29 @@
+AuthTokenFilter:
+
+La classe AuthTokenFilter joue un rôle crucial dans la gestion de la sécurité
+de votre application en analysant chaque requête HTTP pour vérifier la présence
+et la validité d'un token JWT.
+La classe AuthTokenFilter est utilisée après que l'utilisateur s'est déjà connecté et a reçu un token JWT. Son rôle est de vérifier et valider le token JWT inclus dans les requêtes HTTP subséquentes pour assurer que l'utilisateur
+est bien authentifié et autorisé à accéder aux ressources demandées.
+
+
+
+ Méthode doFilterInternal:
+ 1-parseJwt(request) : Extrait le token JWT de la requête HTTP.
+ La méthode parseJwt est décrite plus bas.
+
+ 2-jwt != null && jwtUtils.validateJwtToken(jwt) : Vérifie si le token existe et
+  s'il est valide. La méthode validateJwtToken vérifie la signature et
+  la date d'expiration du token.
+
+  3-jwtUtils.getUserNameFromJwtToken(jwt) : Extrait le nom d'utilisateur du token JWT.
+
+  4-userDetailsService.loadUserByUsername(username) : Charge les détails de
+   l'utilisateur en utilisant le service UserDetailsServiceImpl.
+
+  5-UsernamePasswordAuthenticationToken : Crée un objet d'authentification avec
+   les détails de l'utilisateur, marquant l'utilisateur comme authentifié.
+  Cet objet contient également les rôles et les permissions de l'utilisateur (authorities).
+
+  6-SecurityContextHolder.getContext().setAuthentication(authentication) : Définit l'objet d'authentification dans le contexte de sécurité de Spring, ce qui permet à l'application de
+  savoir que l'utilisateur est authentifié pour cette session.

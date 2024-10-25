@@ -1,0 +1,81 @@
+JwtUtils :
+
+Génération de JWT : Génère des tokens JWT basés sur les détails de l'utilisateur.
+Validation de JWT : Valide les tokens JWT pour s'assurer qu'ils sont corrects et non expirés.
+Extraction d'informations : Extrait des informations, telles que le nom d'utilisateur, du token JWT.
+AuthEntryPointJwt :
+
+Gère les erreurs d'authentification, en envoyant une réponse HTTP 401 (Unauthorized) lorsqu'une requête non authentifiée tente d'accéder à une ressource protégée.
+AuthTokenFilter :
+
+Filtre les requêtes HTTP pour extraire et valider le token JWT.
+Configure l'authentification de l'utilisateur dans le contexte de sécurité de Spring si le token JWT est valide.
+
+
+
+
+premierement : jwtUtils
+generateJwtToken(Authentication authentication) : Génère un JWT en utilisant les informations d'authentification de l'utilisateur.
+ Il inclut le nom d'utilisateur, la date d'émission et la date d'expiration.
+
+
+ 1-Tentative de connexion de l'utilisateur :
+
+ L'utilisateur saisit son nom d'utilisateur (username) et son mot de passe (password) pour se connecter.
+
+
+ 2-Authentification avec Spring Security :
+
+ Les informations d'identification (nom d'utilisateur et mot de passe) sont envoyées à l'application, généralement via un endpoint d'authentification (par exemple, /login).
+ Spring Security utilise un objet Authentication pour encapsuler ces informations d'identification.
+
+
+
+ 3-Utilisation de UserDetailsServiceImpl pour charger les détails de l'utilisateur :
+
+ Spring Security appelle la méthode loadUserByUsername(String username) de la classe UserDetailsServiceImpl.
+ Cette méthode récupère les détails de l'utilisateur (y compris le nom d'utilisateur, le mot de passe, et les rôles/autorités) depuis la base de données ou une autre source de données.
+ Les informations récupérées sont encapsulées dans un objet UserDetails, généralement une instance de UserDetailsImpl.
+
+
+ 4-Création de l'objet Authentication :
+
+ Si les informations d'identification sont valides (c'est-à-dire, si le mot de passe fourni correspond à celui stocké), Spring Security crée un objet Authentication représentant l'utilisateur authentifié.
+ L'objet Authentication contient des informations sur l'utilisateur, y compris le principal (qui est une instance de UserDetailsImpl), les rôles/autorités, et l'état d'authentification.
+ Génération du token JWT avec JwtUtils :
+
+ Une fois l'utilisateur authentifié, l'application utilise JwtUtils pour générer un token JWT.
+ La méthode generateJwtToken(Authentication authentication) est appelée.
+ authentication.getPrincipal() est appelé pour obtenir le principal de l'utilisateur, qui est une instance de UserDetailsImpl.
+ getprincipal (getPrincipal() : Récupère les détails de l'utilisateur)
+ Les détails de l'utilisateur (comme le nom d'utilisateur) sont utilisés pour créer le token JWT.
+Le token JWT est signé avec une clé secrète (définie dans jwtSecret) et une date d'expiration
+
+
+
+
+
+
+
+
+private Key key()
+Cette méthode génère la clé utilisée pour signer et vérifier les tokens JWT
+
+
+public String getUserNameFromJwtToken(String token)
+Cette méthode extrait le nom d'utilisateur (sujet) du token JWT. Voici le processus :
+
+Jwts.parserBuilder().setSigningKey(key()).build() : Crée un parser JWT configuré avec la clé de signature pour vérifier le token.
+parseClaimsJws(token) : Analyse le token JWT et vérifie sa signature.
+getBody().getSubject() : Récupère les revendications du corps du token et retourne le sujet (nom d'utilisateur) du token.
+
+
+
+public boolean validateJwtToken(String authToken)
+Cette méthode vérifie si le token JWT est valide en utilisant la clé de signature. Elle vérifie la signature du token et traite les exceptions spécifiques pour différentes erreurs possibles :
+
+MalformedJwtException : Le token est mal formé.
+ExpiredJwtException : Le token a expiré.
+UnsupportedJwtException : Le token est d'un type non supporté.
+IllegalArgumentException : La chaîne de revendications est vide ou nulle.
+Si le token est valide, la méthode retourne true, sinon elle retourne false.
